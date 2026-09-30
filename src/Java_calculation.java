@@ -1,8 +1,9 @@
 import javax.swing.table.DefaultTableModel;
 import javax.swing.JOptionPane;
+import java.util.ArrayList;
 
 public class Java_calculation extends javax.swing.JFrame {
-
+    ArrayList<RecIntegral> arrInteg = new ArrayList<>();
     
     private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(Java_calculation.class.getName());
 
@@ -37,6 +38,8 @@ public class Java_calculation extends javax.swing.JFrame {
         jButtonCalculate = new javax.swing.JButton();
         jScrollPane1 = new javax.swing.JScrollPane();
         jTable1 = new javax.swing.JTable();
+        jButtonFill = new javax.swing.JButton();
+        jButtonClear = new javax.swing.JButton();
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
@@ -162,6 +165,12 @@ public class Java_calculation extends javax.swing.JFrame {
         jTable1.setShowVerticalLines(true);
         jScrollPane1.setViewportView(jTable1);
 
+        jButtonFill.setText("Fill from collection");
+        jButtonFill.addActionListener(this::jButtonFillActionPerformed);
+
+        jButtonClear.setText("Clear table");
+        jButtonClear.addActionListener(this::jButtonClearActionPerformed);
+
         javax.swing.GroupLayout jPanel6Layout = new javax.swing.GroupLayout(jPanel6);
         jPanel6.setLayout(jPanel6Layout);
         jPanel6Layout.setHorizontalGroup(
@@ -178,6 +187,12 @@ public class Java_calculation extends javax.swing.JFrame {
                 .addContainerGap()
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 546, Short.MAX_VALUE)
                 .addContainerGap())
+            .addGroup(jPanel6Layout.createSequentialGroup()
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(jButtonClear)
+                .addGap(112, 112, 112)
+                .addComponent(jButtonFill)
+                .addGap(91, 91, 91))
         );
         jPanel6Layout.setVerticalGroup(
             jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -187,7 +202,11 @@ public class Java_calculation extends javax.swing.JFrame {
                     .addComponent(jButtonAdd)
                     .addComponent(jButtonDelete)
                     .addComponent(jButtonCalculate))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 140, Short.MAX_VALUE)
+                .addGap(45, 45, 45)
+                .addGroup(jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jButtonFill)
+                    .addComponent(jButtonClear))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 72, Short.MAX_VALUE)
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 85, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(97, 97, 97))
         );
@@ -209,20 +228,22 @@ public class Java_calculation extends javax.swing.JFrame {
                 .addComponent(jPanel5, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(27, 27, 27)
                 .addComponent(jPanel6, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(16, Short.MAX_VALUE))
+                .addContainerGap(15, Short.MAX_VALUE))
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
     private void jButtonDeleteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonDeleteActionPerformed
-        DefaultTableModel tModel = (DefaultTableModel) jTable1.getModel();
-        int rowNum = jTable1.getSelectedRow();
+         DefaultTableModel tModel = (DefaultTableModel) jTable1.getModel();
+         int rowNum = jTable1.getSelectedRow();
 
-        if (rowNum == -1) {
+         if (rowNum == -1) {
              JOptionPane.showMessageDialog(null, "You need to select a row");
-        } else {
-            tModel.removeRow(rowNum);
+         } else {
+             tModel.removeRow(rowNum);
+             arrInteg.remove(rowNum);
+
         }
     }//GEN-LAST:event_jButtonDeleteActionPerformed
 
@@ -232,16 +253,20 @@ public class Java_calculation extends javax.swing.JFrame {
         if (rowNum == -1) {
             JOptionPane.showMessageDialog(null, "You need to select a row");
         } else {
-        DefaultTableModel tModel = (DefaultTableModel) jTable1.getModel();
+            DefaultTableModel tModel = (DefaultTableModel) jTable1.getModel();
 
-        double lowLim = Double.parseDouble(tModel.getValueAt(rowNum, 0).toString());
-        double upperLim = Double.parseDouble(tModel.getValueAt(rowNum, 1).toString());
-        double step = Double.parseDouble(tModel.getValueAt(rowNum, 2).toString());
+            double lowLim = Double.parseDouble(tModel.getValueAt(rowNum, 0).toString());
+            double upperLim = Double.parseDouble(tModel.getValueAt(rowNum, 1).toString());
+            double step = Double.parseDouble(tModel.getValueAt(rowNum, 2).toString());
 
-        double result = new RecIntegral(lowLim, upperLim, step).CalcIntegral(lowLim, upperLim, step);
+            RecIntegral rec = new RecIntegral(lowLim, upperLim, step);
+            double result = rec.CalcIntegral(rec.getLowLim(), rec.getUpperLim(), rec.getStep());
+            rec.setResult(result);
 
-        tModel.setValueAt(result, rowNum, 3);
+            tModel.setValueAt(rec.getResult(), rowNum, 3);
+            arrInteg.set(rowNum, rec);
 }
+
     }//GEN-LAST:event_jButtonCalculateActionPerformed
 
     private void jTextFieldUpperLimitActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextFieldUpperLimitActionPerformed
@@ -257,13 +282,37 @@ public class Java_calculation extends javax.swing.JFrame {
         double upperLim = Double.parseDouble(jTextFieldUpperLimit.getText());
         double step = Double.parseDouble(jTextFieldStep.getText());
 
+        RecIntegral rec = new RecIntegral(lowLim, upperLim, step);
+        arrInteg.add(rec);
+
+        DefaultTableModel tModel = (DefaultTableModel) jTable1.getModel();
+        tModel.addRow(new Object[] {rec.getLowLim(), rec.getUpperLim(), rec.getStep()});
+
         jTextFieldLowerLimit.setText("");
         jTextFieldUpperLimit.setText("");
         jTextFieldStep.setText("");
-
-        DefaultTableModel tModel = (DefaultTableModel) jTable1.getModel();
-        tModel.addRow(new Object[] {lowLim, upperLim, step});
     }//GEN-LAST:event_jButtonAddActionPerformed
+
+    private void jButtonFillActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonFillActionPerformed
+        // jButtonFillActionPerformed
+        DefaultTableModel tModel = (DefaultTableModel) jTable1.getModel();
+        tModel.setNumRows(0);
+
+        for (RecIntegral item : arrInteg) {
+            tModel.addRow(new Object[] {
+                item.getLowLim(),
+                item.getUpperLim(),
+                item.getStep(),
+                item.getResult()
+            });
+        }
+    }//GEN-LAST:event_jButtonFillActionPerformed
+
+    private void jButtonClearActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonClearActionPerformed
+        // jButtonClearActionPerformed
+        DefaultTableModel tModel = (DefaultTableModel) jTable1.getModel();
+        tModel.setNumRows(0);
+    }//GEN-LAST:event_jButtonClearActionPerformed
 
     /**
      * @param args the command line arguments
@@ -293,7 +342,9 @@ public class Java_calculation extends javax.swing.JFrame {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButtonAdd;
     private javax.swing.JButton jButtonCalculate;
+    private javax.swing.JButton jButtonClear;
     private javax.swing.JButton jButtonDelete;
+    private javax.swing.JButton jButtonFill;
     private javax.swing.JLabel jLabelLower;
     private javax.swing.JLabel jLabelStep;
     private javax.swing.JLabel jLabelUpper;
