@@ -238,26 +238,12 @@ public class Java_calculation extends javax.swing.JFrame {
         double upperLim = Double.parseDouble(tModel.getValueAt(rowNum, 1).toString());
         double step = Double.parseDouble(tModel.getValueAt(rowNum, 2).toString());
 
-        double result = CalcIntegral(lowLim, upperLim, step);
+        double result = new RecIntegral(lowLim, upperLim, step).CalcIntegral(lowLim, upperLim, step);
 
         tModel.setValueAt(result, rowNum, 3);
 }
     }//GEN-LAST:event_jButtonCalculateActionPerformed
-public double f(double x) {
-    return Math.sqrt(x);   // my variant 6
-}
 
-public double CalcIntegral(double lowLim, double upLim, double step) {
-    double start = lowLim, h, sumS = 0;
-
-    do {
-        h = Math.min(step, (upLim - start));
-        sumS += h * (f(start) + f(start + h)) / 2;
-        start += h;
-    } while (start < upLim);
-
-    return sumS;
-}
     private void jTextFieldUpperLimitActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextFieldUpperLimitActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_jTextFieldUpperLimitActionPerformed
