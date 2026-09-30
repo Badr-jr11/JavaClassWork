@@ -1,6 +1,0 @@
-javaintegralcalculation.JavaIntegralCalculation$1
-javaintegralcalculation.JavaIntegralCalculation$2
-javaintegralcalculation.JavaIntegralCalculation$3
-javaintegralcalculation.JavaIntegralCalculation
-javaintegralcalculation.JavaIntegralCalculation$4
-javaintegralcalculation.JavaIntegralCalculation$5

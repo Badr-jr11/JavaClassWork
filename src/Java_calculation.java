@@ -1,13 +1,8 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
- */
+import javax.swing.table.DefaultTableModel;
+import javax.swing.JOptionPane;
 
-/**
- *
- * @author badrsmac
- */
 public class Java_calculation extends javax.swing.JFrame {
+
     
     private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(Java_calculation.class.getName());
 
@@ -30,9 +25,12 @@ public class Java_calculation extends javax.swing.JFrame {
         jPanel1 = new javax.swing.JPanel();
         jPanel2 = new javax.swing.JPanel();
         jPanel5 = new javax.swing.JPanel();
-        jTextFieldLowerLimit = new javax.swing.JLabel();
-        jTextFieldUpperLimit = new javax.swing.JLabel();
-        jTextFieldStep = new javax.swing.JLabel();
+        jLabelLower = new javax.swing.JLabel();
+        jLabelUpper = new javax.swing.JLabel();
+        jLabelStep = new javax.swing.JLabel();
+        jTextFieldLowerLimit = new javax.swing.JTextField();
+        jTextFieldUpperLimit = new javax.swing.JTextField();
+        jTextFieldStep = new javax.swing.JTextField();
         jPanel6 = new javax.swing.JPanel();
         jButtonAdd = new javax.swing.JButton();
         jButtonDelete = new javax.swing.JButton();
@@ -67,40 +65,72 @@ public class Java_calculation extends javax.swing.JFrame {
         jPanel5.setBackground(new java.awt.Color(255, 255, 102));
         jPanel5.setBorder(javax.swing.BorderFactory.createTitledBorder("Data"));
 
-        jTextFieldLowerLimit.setText("Lower Limit");
+        jLabelLower.setText("Lower Limit");
 
-        jTextFieldUpperLimit.setText("Upper Limit");
+        jLabelUpper.setText("Upper Limit");
 
-        jTextFieldStep.setText("Step");
+        jLabelStep.setText("Step");
+
+        jTextFieldLowerLimit.setColumns(10);
+        jTextFieldLowerLimit.addActionListener(this::jTextFieldLowerLimitActionPerformed);
+
+        jTextFieldUpperLimit.setColumns(10);
+        jTextFieldUpperLimit.addActionListener(this::jTextFieldUpperLimitActionPerformed);
+
+        jTextFieldStep.setColumns(10);
 
         javax.swing.GroupLayout jPanel5Layout = new javax.swing.GroupLayout(jPanel5);
         jPanel5.setLayout(jPanel5Layout);
         jPanel5Layout.setHorizontalGroup(
             jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel5Layout.createSequentialGroup()
-                .addGap(53, 53, 53)
-                .addComponent(jTextFieldLowerLimit)
-                .addGap(78, 78, 78)
-                .addComponent(jTextFieldUpperLimit)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(jTextFieldStep)
-                .addGap(63, 63, 63))
+                .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel5Layout.createSequentialGroup()
+                        .addGap(53, 53, 53)
+                        .addComponent(jLabelLower))
+                    .addGroup(jPanel5Layout.createSequentialGroup()
+                        .addGap(27, 27, 27)
+                        .addComponent(jTextFieldLowerLimit, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addGap(26, 26, 26)
+                .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel5Layout.createSequentialGroup()
+                        .addGap(78, 78, 78)
+                        .addComponent(jLabelUpper)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel5Layout.createSequentialGroup()
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(jTextFieldUpperLimit, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(41, 41, 41)))
+                .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel5Layout.createSequentialGroup()
+                        .addGap(77, 77, 77)
+                        .addComponent(jLabelStep)
+                        .addGap(63, 63, 63))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel5Layout.createSequentialGroup()
+                        .addComponent(jTextFieldStep, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(15, 15, 15))))
         );
         jPanel5Layout.setVerticalGroup(
             jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel5Layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jTextFieldLowerLimit)
-                    .addComponent(jTextFieldUpperLimit)
-                    .addComponent(jTextFieldStep))
-                .addContainerGap(77, Short.MAX_VALUE))
+                    .addComponent(jLabelLower)
+                    .addComponent(jLabelUpper)
+                    .addComponent(jLabelStep))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jTextFieldLowerLimit, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jTextFieldUpperLimit, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jTextFieldStep, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(42, Short.MAX_VALUE))
         );
 
         jPanel6.setBackground(new java.awt.Color(255, 255, 51));
         jPanel6.setBorder(javax.swing.BorderFactory.createTitledBorder("Actions"));
 
         jButtonAdd.setText("Add Item");
+        jButtonAdd.addActionListener(this::jButtonAddActionPerformed);
 
         jButtonDelete.setText("Delete Item");
         jButtonDelete.addActionListener(this::jButtonDeleteActionPerformed);
@@ -137,16 +167,16 @@ public class Java_calculation extends javax.swing.JFrame {
         jPanel6Layout.setHorizontalGroup(
             jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel6Layout.createSequentialGroup()
-                .addGap(39, 39, 39)
+                .addGap(59, 59, 59)
                 .addComponent(jButtonAdd)
-                .addGap(47, 47, 47)
+                .addGap(99, 99, 99)
                 .addComponent(jButtonDelete)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(jButtonCalculate)
-                .addGap(46, 46, 46))
+                .addGap(37, 37, 37))
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel6Layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jScrollPane1)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 546, Short.MAX_VALUE)
                 .addContainerGap())
         );
         jPanel6Layout.setVerticalGroup(
@@ -186,12 +216,68 @@ public class Java_calculation extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void jButtonDeleteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonDeleteActionPerformed
-        // TODO add your handling code here:
+        DefaultTableModel tModel = (DefaultTableModel) jTable1.getModel();
+        int rowNum = jTable1.getSelectedRow();
+
+        if (rowNum == -1) {
+             JOptionPane.showMessageDialog(null, "You need to select a row");
+        } else {
+            tModel.removeRow(rowNum);
+        }
     }//GEN-LAST:event_jButtonDeleteActionPerformed
 
     private void jButtonCalculateActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonCalculateActionPerformed
-        // TODO add your handling code here:
+        int rowNum = jTable1.getSelectedRow();
+
+        if (rowNum == -1) {
+            JOptionPane.showMessageDialog(null, "You need to select a row");
+        } else {
+        DefaultTableModel tModel = (DefaultTableModel) jTable1.getModel();
+
+        double lowLim = Double.parseDouble(tModel.getValueAt(rowNum, 0).toString());
+        double upperLim = Double.parseDouble(tModel.getValueAt(rowNum, 1).toString());
+        double step = Double.parseDouble(tModel.getValueAt(rowNum, 2).toString());
+
+        double result = CalcIntegral(lowLim, upperLim, step);
+
+        tModel.setValueAt(result, rowNum, 3);
+}
     }//GEN-LAST:event_jButtonCalculateActionPerformed
+public double f(double x) {
+    return Math.sqrt(x);   // my variant 6
+}
+
+public double CalcIntegral(double lowLim, double upLim, double step) {
+    double start = lowLim, h, sumS = 0;
+
+    do {
+        h = Math.min(step, (upLim - start));
+        sumS += h * (f(start) + f(start + h)) / 2;
+        start += h;
+    } while (start < upLim);
+
+    return sumS;
+}
+    private void jTextFieldUpperLimitActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextFieldUpperLimitActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jTextFieldUpperLimitActionPerformed
+
+    private void jTextFieldLowerLimitActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextFieldLowerLimitActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jTextFieldLowerLimitActionPerformed
+
+    private void jButtonAddActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonAddActionPerformed
+        double lowLim = Double.parseDouble(jTextFieldLowerLimit.getText());
+        double upperLim = Double.parseDouble(jTextFieldUpperLimit.getText());
+        double step = Double.parseDouble(jTextFieldStep.getText());
+
+        jTextFieldLowerLimit.setText("");
+        jTextFieldUpperLimit.setText("");
+        jTextFieldStep.setText("");
+
+        DefaultTableModel tModel = (DefaultTableModel) jTable1.getModel();
+        tModel.addRow(new Object[] {lowLim, upperLim, step});
+    }//GEN-LAST:event_jButtonAddActionPerformed
 
     /**
      * @param args the command line arguments
@@ -222,14 +308,17 @@ public class Java_calculation extends javax.swing.JFrame {
     private javax.swing.JButton jButtonAdd;
     private javax.swing.JButton jButtonCalculate;
     private javax.swing.JButton jButtonDelete;
+    private javax.swing.JLabel jLabelLower;
+    private javax.swing.JLabel jLabelStep;
+    private javax.swing.JLabel jLabelUpper;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel5;
     private javax.swing.JPanel jPanel6;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JTable jTable1;
-    private javax.swing.JLabel jTextFieldLowerLimit;
-    private javax.swing.JLabel jTextFieldStep;
-    private javax.swing.JLabel jTextFieldUpperLimit;
+    private javax.swing.JTextField jTextFieldLowerLimit;
+    private javax.swing.JTextField jTextFieldStep;
+    private javax.swing.JTextField jTextFieldUpperLimit;
     // End of variables declaration//GEN-END:variables
 }
