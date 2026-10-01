@@ -1,17 +1,14 @@
 import javax.swing.table.DefaultTableModel;
 import javax.swing.JOptionPane;
 import java.util.ArrayList;
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
 import javax.swing.JFileChooser;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
 public class Java_calculation extends javax.swing.JFrame {
     ArrayList<RecIntegral> arrInteg = new ArrayList<>();
-    
+
     private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(Java_calculation.class.getName());
 
     /**
@@ -282,48 +279,43 @@ public class Java_calculation extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void jButtonDeleteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonDeleteActionPerformed
-         DefaultTableModel tModel = (DefaultTableModel) jTable1.getModel();
-         int rowNum = jTable1.getSelectedRow();
+        DefaultTableModel tModel = (DefaultTableModel) jTable1.getModel();
+        int rowNum = jTable1.getSelectedRow();
 
-         if (rowNum == -1) {
-             JOptionPane.showMessageDialog(null, "You need to select a row");
-         } else {
-             tModel.removeRow(rowNum);
-             arrInteg.remove(rowNum);
-
+        if (rowNum == -1) {
+            JOptionPane.showMessageDialog(null, "You need to select a row");
+        } else {
+            tModel.removeRow(rowNum);
+            arrInteg.remove(rowNum);
         }
     }//GEN-LAST:event_jButtonDeleteActionPerformed
 
     private void jButtonCalculateActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonCalculateActionPerformed
-       
-    int rowNum = jTable1.getSelectedRow();
+        int rowNum = jTable1.getSelectedRow();
 
-    if (rowNum == -1) {
-        JOptionPane.showMessageDialog(null, "You need to select a row");
-    } else {
+        if (rowNum == -1) {
+            JOptionPane.showMessageDialog(null, "You need to select a row");
+            return;
+        }
+
         DefaultTableModel tModel = (DefaultTableModel) jTable1.getModel();
 
-        double upperLim;
-        double lowLim;
-        double step;
-        double result;
-
         try {
-            lowLim   = Double.parseDouble(tModel.getValueAt(rowNum, 0).toString());
-            upperLim = Double.parseDouble(tModel.getValueAt(rowNum, 1).toString());
-            step     = Double.parseDouble(tModel.getValueAt(rowNum, 2).toString());
+            double lowLim   = Double.parseDouble(tModel.getValueAt(rowNum, 0).toString());
+            double upperLim = Double.parseDouble(tModel.getValueAt(rowNum, 1).toString());
+            double step     = Double.parseDouble(tModel.getValueAt(rowNum, 2).toString());
 
             if (step == 0) {
                 throw new IllegalArgumentException("Step cannot be 0 (division by zero)");
             }
 
             RecIntegral rec = new RecIntegral(lowLim, upperLim, step);
-            result = rec.CalcIntegral(rec.getLowLim(), rec.getUpperLim(), rec.getStep());
-            rec.setResult(result);
+            startThreads(rec, rowNum);
 
-            tModel.setValueAt(rec.getResult(), rowNum, 3);
-            arrInteg.set(rowNum, rec);
-            
+        } catch (NumberFormatException ex) {
+            JOptionPane.showMessageDialog(this,
+                    "Enter the correct numbers (the decimal separator is a dot)",
+                    "Input error", JOptionPane.ERROR_MESSAGE);
         } catch (IllegalArgumentException e) {
             JOptionPane.showMessageDialog(this,
                     e.getMessage(),
@@ -333,10 +325,6 @@ public class Java_calculation extends javax.swing.JFrame {
                     exe.getMessage() + "Your data: " + exe.getErrVal(),
                     "Input error", JOptionPane.WARNING_MESSAGE);
         }
-    }
-
-
-
     }//GEN-LAST:event_jButtonCalculateActionPerformed
 
     private void jTextFieldUpperLimitActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextFieldUpperLimitActionPerformed
@@ -348,39 +336,34 @@ public class Java_calculation extends javax.swing.JFrame {
     }//GEN-LAST:event_jTextFieldLowerLimitActionPerformed
 
     private void jButtonAddActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonAddActionPerformed
-     
-    double lowLim;
-    double upperLim;
-    double step;
+        double lowLim;
+        double upperLim;
+        double step;
 
-    try {
-        lowLim   = Double.parseDouble(jTextFieldLowerLimit.getText());
-        upperLim = Double.parseDouble(jTextFieldUpperLimit.getText());
-        step     = Double.parseDouble(jTextFieldStep.getText());
+        try {
+            lowLim   = Double.parseDouble(jTextFieldLowerLimit.getText());
+            upperLim = Double.parseDouble(jTextFieldUpperLimit.getText());
+            step     = Double.parseDouble(jTextFieldStep.getText());
 
-        RecIntegral rec = new RecIntegral(lowLim, upperLim, step);
-        arrInteg.add(rec);
+            RecIntegral rec = new RecIntegral(lowLim, upperLim, step);
+            arrInteg.add(rec);
 
-        DefaultTableModel tModel = (DefaultTableModel) jTable1.getModel();
-        tModel.addRow(new Object[]{rec.getLowLim(), rec.getUpperLim(), rec.getStep()});
+            DefaultTableModel tModel = (DefaultTableModel) jTable1.getModel();
+            tModel.addRow(new Object[]{rec.getLowLim(), rec.getUpperLim(), rec.getStep()});
 
-    } catch (NumberFormatException ex) {
-        JOptionPane.showMessageDialog(this,
-                "Enter the correct numbers (the decimal separator is a dot)",
-                "Input error", JOptionPane.ERROR_MESSAGE);
-        
-     } catch (InvalidRangeException exe) {
-        JOptionPane.showMessageDialog(this,
-                exe.getMessage() + "Your data: " + exe.getErrVal(),
-                "Input error", JOptionPane.WARNING_MESSAGE);
-  
-        
-    } finally {
-        jTextFieldLowerLimit.setText("");
-        jTextFieldUpperLimit.setText("");
-        jTextFieldStep.setText("");
-    }
-
+        } catch (NumberFormatException ex) {
+            JOptionPane.showMessageDialog(this,
+                    "Enter the correct numbers (the decimal separator is a dot)",
+                    "Input error", JOptionPane.ERROR_MESSAGE);
+        } catch (InvalidRangeException exe) {
+            JOptionPane.showMessageDialog(this,
+                    exe.getMessage() + "Your data: " + exe.getErrVal(),
+                    "Input error", JOptionPane.WARNING_MESSAGE);
+        } finally {
+            jTextFieldLowerLimit.setText("");
+            jTextFieldUpperLimit.setText("");
+            jTextFieldStep.setText("");
+        }
     }//GEN-LAST:event_jButtonAddActionPerformed
 
     private void jButtonFillActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonFillActionPerformed
@@ -405,7 +388,7 @@ public class Java_calculation extends javax.swing.JFrame {
     }//GEN-LAST:event_jButtonClearActionPerformed
 
     private void jMenuItemSaveTextActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItemSaveTextActionPerformed
-           JFileChooser f = new JFileChooser();
+        JFileChooser f = new JFileChooser();
         f.setFileFilter(new FileNameExtensionFilter("Text file (*.txt)", "txt"));
 
         if (f.showSaveDialog(this) != JFileChooser.APPROVE_OPTION) {
@@ -425,7 +408,7 @@ public class Java_calculation extends javax.swing.JFrame {
     }//GEN-LAST:event_jMenuItemSaveTextActionPerformed
 
     private void jMenuItemLoadTextActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItemLoadTextActionPerformed
-                        JFileChooser f = new JFileChooser();
+        JFileChooser f = new JFileChooser();
         f.setFileFilter(new FileNameExtensionFilter("Text file (*.txt)", "txt"));
 
         if (f.showOpenDialog(this) != JFileChooser.APPROVE_OPTION) {
@@ -433,7 +416,7 @@ public class Java_calculation extends javax.swing.JFrame {
         }
 
         try {
-                        File file = f.getSelectedFile();
+            File file = f.getSelectedFile();
             if (!file.exists() && !file.getPath().endsWith(".txt")) {
                 file = new File(file.getPath() + ".txt");
             }
@@ -455,7 +438,7 @@ public class Java_calculation extends javax.swing.JFrame {
     }//GEN-LAST:event_jMenuItemLoadTextActionPerformed
 
     private void jMenuItemSaveJsonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItemSaveJsonActionPerformed
-                JFileChooser f = new JFileChooser();
+        JFileChooser f = new JFileChooser();
         f.setFileFilter(new FileNameExtensionFilter("JSON file (*.json)", "json"));
 
         if (f.showSaveDialog(this) != JFileChooser.APPROVE_OPTION) {
@@ -475,7 +458,7 @@ public class Java_calculation extends javax.swing.JFrame {
     }//GEN-LAST:event_jMenuItemSaveJsonActionPerformed
 
     private void jMenuItemLoadJsonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItemLoadJsonActionPerformed
-                JFileChooser f = new JFileChooser();
+        JFileChooser f = new JFileChooser();
         f.setFileFilter(new FileNameExtensionFilter("JSON file (*.json)", "json"));
 
         if (f.showOpenDialog(this) != JFileChooser.APPROVE_OPTION) {
@@ -505,7 +488,7 @@ public class Java_calculation extends javax.swing.JFrame {
     }//GEN-LAST:event_jMenuItemLoadJsonActionPerformed
 
     private void jMenuItemSaveBinaryActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItemSaveBinaryActionPerformed
-                JFileChooser f = new JFileChooser();
+        JFileChooser f = new JFileChooser();
         f.setFileFilter(new FileNameExtensionFilter("Binary file (*.ser)", "ser"));
 
         if (f.showSaveDialog(this) != JFileChooser.APPROVE_OPTION) {
@@ -525,7 +508,7 @@ public class Java_calculation extends javax.swing.JFrame {
     }//GEN-LAST:event_jMenuItemSaveBinaryActionPerformed
 
     private void jMenuItemLoadBinaryActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItemLoadBinaryActionPerformed
-                JFileChooser f = new JFileChooser();
+        JFileChooser f = new JFileChooser();
         f.setFileFilter(new FileNameExtensionFilter("Binary file (*.ser)", "ser"));
 
         if (f.showOpenDialog(this) != JFileChooser.APPROVE_OPTION) {
@@ -548,7 +531,55 @@ public class Java_calculation extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_jMenuItemLoadBinaryActionPerformed
 
-        private void fillTable() {
+    // Lab 7: l-7sab dyal l-intégrale f bzaf d les threads (Runnable)
+    private void startThreads(final RecIntegral rec, final int rowNum) {
+        // thread "coordinateur": kay-lanci les threads o kaytsennahom,
+        // bach l-interface ma-tjmedch
+        new Thread(() -> {
+            final int THREADS = 9;   // variant 6 + 3
+
+            double lowLim = rec.getLowLim();
+            double upperLim = rec.getUpperLim();
+            double step = rec.getStep();
+
+            IntegralTask[] tasks = new IntegralTask[THREADS];
+            Thread[] threads = new Thread[THREADS];
+            double part = (upperLim - lowLim) / THREADS;
+
+            for (int i = 0; i < THREADS; i++) {
+                double a = lowLim + i * part;
+                double b = (i == THREADS - 1) ? upperLim : a + part;
+                tasks[i] = new IntegralTask(rec, a, b, step);
+                threads[i] = new Thread(tasks[i], "IntegralThread-" + (i + 1));
+                threads[i].start();
+            }
+
+            double sum = 0;
+            try {
+                for (int i = 0; i < THREADS; i++) {
+                    threads[i].join();            // tsenna l-thread ysali
+                    sum += tasks[i].getResult();
+                }
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+                return;
+            }
+
+            final double result = sum;
+
+            // l-tableau khasso ytbeddel ghi mn l-thread dyal Swing
+            javax.swing.SwingUtilities.invokeLater(() -> {
+                DefaultTableModel tModel = (DefaultTableModel) jTable1.getModel();
+                rec.setResult(result);
+                if (rowNum < tModel.getRowCount() && rowNum < arrInteg.size()) {
+                    tModel.setValueAt(result, rowNum, 3);
+                    arrInteg.set(rowNum, rec);
+                }
+            });
+        }, "IntegralCoordinator").start();
+    }
+
+    private void fillTable() {
         DefaultTableModel model = (DefaultTableModel) jTable1.getModel();
         model.setRowCount(0);
         for (RecIntegral obj : arrInteg) {
@@ -557,7 +588,7 @@ public class Java_calculation extends javax.swing.JFrame {
             });
         }
     }
-    
+
     /**
      * @param args the command line arguments
      */
@@ -565,7 +596,7 @@ public class Java_calculation extends javax.swing.JFrame {
         /* Set the Nimbus look and feel */
         //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
         /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
+         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html
          */
         try {
             for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
