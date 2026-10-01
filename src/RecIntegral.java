@@ -1,9 +1,11 @@
-import java.io.Serializable;
+import java.io.Externalizable;
+import java.io.IOException;
+import java.io.ObjectInput;
+import java.io.ObjectOutput;
 
-public class RecIntegral implements Serializable {
+public class RecIntegral implements Externalizable {
 
     private static final long serialVersionUID = 1L;
-
 
     private static final double MIN_VALUE = 0.000001;
     private static final double MAX_VALUE = 1000000.0;
@@ -12,6 +14,10 @@ public class RecIntegral implements Serializable {
     private double lowLim;
     private double step;
     private double result;
+
+    // darori l Externalizable: constructeur khawi o public
+    public RecIntegral() {
+    }
 
     public RecIntegral(double lowLim, double upperLim, double step) throws InvalidRangeException {
         validateRange(lowLim);
@@ -51,6 +57,22 @@ public class RecIntegral implements Serializable {
                 "The lower limit (" + lowLim + ") must not be greater than the upper limit ("
                 + upperLim + ")\n", lowLim);
         }
+    }
+
+    @Override
+    public void writeExternal(ObjectOutput out) throws IOException {
+        out.writeDouble(lowLim);
+        out.writeDouble(upperLim);
+        out.writeDouble(step);
+        out.writeDouble(result);
+    }
+
+    @Override
+    public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
+        lowLim = in.readDouble();
+        upperLim = in.readDouble();
+        step = in.readDouble();
+        result = in.readDouble();
     }
 
     public double getLowLim() { return lowLim; }
