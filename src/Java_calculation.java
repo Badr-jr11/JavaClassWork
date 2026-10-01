@@ -51,6 +51,8 @@ public class Java_calculation extends javax.swing.JFrame {
         jMenu1 = new javax.swing.JMenu();
         jMenuItemSaveText = new javax.swing.JMenuItem();
         jMenuItemLoadText = new javax.swing.JMenuItem();
+        jMenuItemSaveJson = new javax.swing.JMenuItem();
+        jMenuItemLoadJson = new javax.swing.JMenuItem();
         jMenu2 = new javax.swing.JMenu();
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
@@ -231,6 +233,14 @@ public class Java_calculation extends javax.swing.JFrame {
         jMenuItemLoadText.addActionListener(this::jMenuItemLoadTextActionPerformed);
         jMenu1.add(jMenuItemLoadText);
 
+        jMenuItemSaveJson.setText("Save the json");
+        jMenuItemSaveJson.addActionListener(this::jMenuItemSaveJsonActionPerformed);
+        jMenu1.add(jMenuItemSaveJson);
+
+        jMenuItemLoadJson.setText("Load the json");
+        jMenuItemLoadJson.addActionListener(this::jMenuItemLoadJsonActionPerformed);
+        jMenu1.add(jMenuItemLoadJson);
+
         jMenuBar1.add(jMenu1);
 
         jMenu2.setText("Edit");
@@ -385,72 +395,42 @@ public class Java_calculation extends javax.swing.JFrame {
     }//GEN-LAST:event_jButtonClearActionPerformed
 
     private void jMenuItemSaveTextActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItemSaveTextActionPerformed
-                JFileChooser f = new JFileChooser();
-        FileNameExtensionFilter filter =
-                new FileNameExtensionFilter("Text file (*.txt)", "txt");
-        f.setFileFilter(filter);
+           JFileChooser f = new JFileChooser();
+        f.setFileFilter(new FileNameExtensionFilter("Text file (*.txt)", "txt"));
 
         if (f.showSaveDialog(this) != JFileChooser.APPROVE_OPTION) {
-            return;   // l-user dar Cancel
+            return;
         }
 
         File file = f.getSelectedFile();
-
         if (!file.getPath().endsWith(".txt")) {
             file = new File(file.getPath() + ".txt");
         }
 
-        try (FileWriter writer = new FileWriter(file, false)) {
-            for (RecIntegral o : arrInteg) {
-                writer.write(o.getLowLim() + " " +
-                             o.getUpperLim() + " " +
-                             o.getStep() + " " +
-                             o.getResult() + "\n");
-            }
-            writer.flush();
+        try {
+            WriteFile.saveText(file, arrInteg);
         } catch (IOException ex) {
             JOptionPane.showMessageDialog(this, ex);
         }
     }//GEN-LAST:event_jMenuItemSaveTextActionPerformed
 
     private void jMenuItemLoadTextActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItemLoadTextActionPerformed
-                JFileChooser f = new JFileChooser();
-        FileNameExtensionFilter filter =
-                new FileNameExtensionFilter("Text file (*.txt)", "txt");
-        f.setFileFilter(filter);
+                        JFileChooser f = new JFileChooser();
+        f.setFileFilter(new FileNameExtensionFilter("Text file (*.txt)", "txt"));
 
         if (f.showOpenDialog(this) != JFileChooser.APPROVE_OPTION) {
-            return;   // l-user dar Cancel
+            return;
         }
 
-        File file = f.getSelectedFile();
-
-        try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
+        try {
+                        File file = f.getSelectedFile();
+            if (!file.exists() && !file.getPath().endsWith(".txt")) {
+                file = new File(file.getPath() + ".txt");
+            }
+            ArrayList<RecIntegral> loaded = ReadFile.loadText(file);
             arrInteg.clear();
-            String temp;
-            while ((temp = reader.readLine()) != null) {
-                if (temp.trim().isEmpty()) {
-                    continue;   // ster khawi
-                }
-                String[] part = temp.trim().split(" ");
-                arrInteg.add(new RecIntegral(
-                        Double.parseDouble(part[0]),
-                        Double.parseDouble(part[1]),
-                        Double.parseDouble(part[2]),
-                        Double.parseDouble(part[3])
-                ));
-            }
-
-            DefaultTableModel model = (DefaultTableModel) jTable1.getModel();
-            model.setRowCount(0);
-            for (RecIntegral obj : arrInteg) {
-                model.addRow(new Object[]{
-                    obj.getLowLim(),
-                    obj.getUpperLim(),
-                    obj.getStep(),
-                    obj.getResult()
-                });
-            }
+            arrInteg.addAll(loaded);
+            fillTable();
         } catch (IOException ex) {
             JOptionPane.showMessageDialog(this, ex);
         } catch (InvalidRangeException exe) {
@@ -464,6 +444,66 @@ public class Java_calculation extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_jMenuItemLoadTextActionPerformed
 
+    private void jMenuItemSaveJsonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItemSaveJsonActionPerformed
+                JFileChooser f = new JFileChooser();
+        f.setFileFilter(new FileNameExtensionFilter("JSON file (*.json)", "json"));
+
+        if (f.showSaveDialog(this) != JFileChooser.APPROVE_OPTION) {
+            return;
+        }
+
+        File file = f.getSelectedFile();
+        if (!file.getPath().endsWith(".json")) {
+            file = new File(file.getPath() + ".json");
+        }
+
+        try {
+            WriteFile.saveJson(file, arrInteg);
+        } catch (IOException ex) {
+            JOptionPane.showMessageDialog(this, ex);
+        }
+    }//GEN-LAST:event_jMenuItemSaveJsonActionPerformed
+
+    private void jMenuItemLoadJsonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItemLoadJsonActionPerformed
+                JFileChooser f = new JFileChooser();
+        f.setFileFilter(new FileNameExtensionFilter("JSON file (*.json)", "json"));
+
+        if (f.showOpenDialog(this) != JFileChooser.APPROVE_OPTION) {
+            return;
+        }
+
+        try {
+            File file = f.getSelectedFile();
+            if (!file.exists() && !file.getPath().endsWith(".json")) {
+                file = new File(file.getPath() + ".json");
+            }
+            ArrayList<RecIntegral> loaded = ReadFile.loadJson(file);
+            arrInteg.clear();
+            arrInteg.addAll(loaded);
+            fillTable();
+        } catch (IOException ex) {
+            JOptionPane.showMessageDialog(this, ex);
+        } catch (InvalidRangeException exe) {
+            JOptionPane.showMessageDialog(this,
+                    exe.getMessage() + "Your data: " + exe.getErrVal(),
+                    "Input error", JOptionPane.WARNING_MESSAGE);
+        } catch (NumberFormatException ex) {
+            JOptionPane.showMessageDialog(this,
+                    "The file format is incorrect",
+                    "Input error", JOptionPane.ERROR_MESSAGE);
+        }
+    }//GEN-LAST:event_jMenuItemLoadJsonActionPerformed
+
+        private void fillTable() {
+        DefaultTableModel model = (DefaultTableModel) jTable1.getModel();
+        model.setRowCount(0);
+        for (RecIntegral obj : arrInteg) {
+            model.addRow(new Object[]{
+                obj.getLowLim(), obj.getUpperLim(), obj.getStep(), obj.getResult()
+            });
+        }
+    }
+    
     /**
      * @param args the command line arguments
      */
@@ -501,7 +541,9 @@ public class Java_calculation extends javax.swing.JFrame {
     private javax.swing.JMenu jMenu1;
     private javax.swing.JMenu jMenu2;
     private javax.swing.JMenuBar jMenuBar1;
+    private javax.swing.JMenuItem jMenuItemLoadJson;
     private javax.swing.JMenuItem jMenuItemLoadText;
+    private javax.swing.JMenuItem jMenuItemSaveJson;
     private javax.swing.JMenuItem jMenuItemSaveText;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
