@@ -53,6 +53,8 @@ public class Java_calculation extends javax.swing.JFrame {
         jMenuItemLoadText = new javax.swing.JMenuItem();
         jMenuItemSaveJson = new javax.swing.JMenuItem();
         jMenuItemLoadJson = new javax.swing.JMenuItem();
+        jMenuItemSaveBinary = new javax.swing.JMenuItem();
+        jMenuItemLoadBinary = new javax.swing.JMenuItem();
         jMenu2 = new javax.swing.JMenu();
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
@@ -223,7 +225,7 @@ public class Java_calculation extends javax.swing.JFrame {
                 .addGap(97, 97, 97))
         );
 
-        jMenu1.setText("File");
+        jMenu1.setText("file");
 
         jMenuItemSaveText.setText("Save the text");
         jMenuItemSaveText.addActionListener(this::jMenuItemSaveTextActionPerformed);
@@ -240,6 +242,14 @@ public class Java_calculation extends javax.swing.JFrame {
         jMenuItemLoadJson.setText("Load the json");
         jMenuItemLoadJson.addActionListener(this::jMenuItemLoadJsonActionPerformed);
         jMenu1.add(jMenuItemLoadJson);
+
+        jMenuItemSaveBinary.setText("Save the binary");
+        jMenuItemSaveBinary.addActionListener(this::jMenuItemSaveBinaryActionPerformed);
+        jMenu1.add(jMenuItemSaveBinary);
+
+        jMenuItemLoadBinary.setText("Load the binary");
+        jMenuItemLoadBinary.addActionListener(this::jMenuItemLoadBinaryActionPerformed);
+        jMenu1.add(jMenuItemLoadBinary);
 
         jMenuBar1.add(jMenu1);
 
@@ -494,6 +504,50 @@ public class Java_calculation extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_jMenuItemLoadJsonActionPerformed
 
+    private void jMenuItemSaveBinaryActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItemSaveBinaryActionPerformed
+                JFileChooser f = new JFileChooser();
+        f.setFileFilter(new FileNameExtensionFilter("Binary file (*.ser)", "ser"));
+
+        if (f.showSaveDialog(this) != JFileChooser.APPROVE_OPTION) {
+            return;
+        }
+
+        File file = f.getSelectedFile();
+        if (!file.getPath().endsWith(".ser")) {
+            file = new File(file.getPath() + ".ser");
+        }
+
+        try {
+            WriteFile.saveBinary(file, arrInteg);
+        } catch (IOException ex) {
+            JOptionPane.showMessageDialog(this, ex);
+        }
+    }//GEN-LAST:event_jMenuItemSaveBinaryActionPerformed
+
+    private void jMenuItemLoadBinaryActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItemLoadBinaryActionPerformed
+                JFileChooser f = new JFileChooser();
+        f.setFileFilter(new FileNameExtensionFilter("Binary file (*.ser)", "ser"));
+
+        if (f.showOpenDialog(this) != JFileChooser.APPROVE_OPTION) {
+            return;
+        }
+
+        try {
+            File file = f.getSelectedFile();
+            if (!file.exists() && !file.getPath().endsWith(".ser")) {
+                file = new File(file.getPath() + ".ser");
+            }
+            ArrayList<RecIntegral> loaded = ReadFile.loadBinary(file);
+            arrInteg.clear();
+            arrInteg.addAll(loaded);
+            fillTable();
+        } catch (IOException | ClassNotFoundException | ClassCastException ex) {
+            JOptionPane.showMessageDialog(this,
+                    "Cannot read the binary file:\n" + ex,
+                    "Input error", JOptionPane.ERROR_MESSAGE);
+        }
+    }//GEN-LAST:event_jMenuItemLoadBinaryActionPerformed
+
         private void fillTable() {
         DefaultTableModel model = (DefaultTableModel) jTable1.getModel();
         model.setRowCount(0);
@@ -541,8 +595,10 @@ public class Java_calculation extends javax.swing.JFrame {
     private javax.swing.JMenu jMenu1;
     private javax.swing.JMenu jMenu2;
     private javax.swing.JMenuBar jMenuBar1;
+    private javax.swing.JMenuItem jMenuItemLoadBinary;
     private javax.swing.JMenuItem jMenuItemLoadJson;
     private javax.swing.JMenuItem jMenuItemLoadText;
+    private javax.swing.JMenuItem jMenuItemSaveBinary;
     private javax.swing.JMenuItem jMenuItemSaveJson;
     private javax.swing.JMenuItem jMenuItemSaveText;
     private javax.swing.JPanel jPanel1;

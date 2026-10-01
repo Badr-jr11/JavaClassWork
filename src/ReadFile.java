@@ -1,7 +1,10 @@
+import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.util.ArrayList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -30,7 +33,6 @@ public class ReadFile {
 
     public static ArrayList<RecIntegral> loadJson(File file)
             throws IOException, InvalidRangeException {
-        // 1) n9raw l-fichier kamel f String wa7da
         StringBuilder sb = new StringBuilder();
         try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
             String temp;
@@ -39,7 +41,6 @@ public class ReadFile {
             }
         }
 
-        // 2) kol { ... } howa objet wa7ed
         ArrayList<RecIntegral> list = new ArrayList<>();
         Matcher objects = Pattern.compile("\\{[^}]*\\}").matcher(sb.toString());
         while (objects.find()) {
@@ -53,12 +54,20 @@ public class ReadFile {
         return list;
     }
 
-    // kayjbed l-valeur dyal "key": 12.5 mn objet JSON
     private static double getValue(String obj, String key) {
         Matcher m = Pattern.compile("\"" + key + "\"\\s*:\\s*([-+0-9.eE]+)").matcher(obj);
         if (!m.find()) {
             throw new NumberFormatException("Missing field: " + key);
         }
         return Double.parseDouble(m.group(1));
+    }
+
+    @SuppressWarnings("unchecked")
+    public static ArrayList<RecIntegral> loadBinary(File file)
+            throws IOException, ClassNotFoundException {
+        try (ObjectInputStream in = new ObjectInputStream(
+                new BufferedInputStream(new FileInputStream(file)))) {
+            return (ArrayList<RecIntegral>) in.readObject();
+        }
     }
 }

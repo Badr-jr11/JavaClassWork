@@ -1,4 +1,9 @@
-public class RecIntegral {
+import java.io.Serializable;
+
+public class RecIntegral implements Serializable {
+
+    private static final long serialVersionUID = 1L;
+
 
     private static final double MIN_VALUE = 0.000001;
     private static final double MAX_VALUE = 1000000.0;

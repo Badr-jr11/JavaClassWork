@@ -1,11 +1,13 @@
+import java.io.BufferedOutputStream;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 
 public class WriteFile {
 
-    // Text: kol objet f ster -> "lowLim upperLim step result"
     public static void saveText(File file, ArrayList<RecIntegral> list) throws IOException {
         try (FileWriter writer = new FileWriter(file, false)) {
             for (RecIntegral o : list) {
@@ -18,7 +20,6 @@ public class WriteFile {
         }
     }
 
-    // JSON: tableau dyal les objets
     public static void saveJson(File file, ArrayList<RecIntegral> list) throws IOException {
         try (FileWriter writer = new FileWriter(file, false)) {
             writer.write("[\n");
@@ -35,6 +36,13 @@ public class WriteFile {
             }
             writer.write("]\n");
             writer.flush();
+        }
+    }
+
+    public static void saveBinary(File file, ArrayList<RecIntegral> list) throws IOException {
+        try (ObjectOutputStream out = new ObjectOutputStream(
+                new BufferedOutputStream(new FileOutputStream(file)))) {
+            out.writeObject(list);
         }
     }
 }
