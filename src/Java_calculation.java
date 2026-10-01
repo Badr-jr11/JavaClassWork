@@ -1,6 +1,10 @@
 import javax.swing.table.DefaultTableModel;
 import javax.swing.JOptionPane;
 import java.util.ArrayList;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.io.File;
 import java.io.IOException;
 import javax.swing.JFileChooser;
@@ -107,22 +111,19 @@ public class Java_calculation extends javax.swing.JFrame {
                     .addGroup(jPanel5Layout.createSequentialGroup()
                         .addGap(27, 27, 27)
                         .addComponent(jTextFieldLowerLimit, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addGap(26, 26, 26)
-                .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
                     .addGroup(jPanel5Layout.createSequentialGroup()
-                        .addGap(78, 78, 78)
-                        .addComponent(jLabelUpper))
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel5Layout.createSequentialGroup()
-                        .addComponent(jTextFieldUpperLimit, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(41, 41, 41)))
-                .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(jPanel5Layout.createSequentialGroup()
-                        .addGap(77, 77, 77)
+                        .addGap(75, 75, 75)
+                        .addComponent(jLabelUpper)
+                        .addGap(125, 125, 125)
                         .addComponent(jLabelStep)
                         .addGap(63, 63, 63))
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel5Layout.createSequentialGroup()
+                    .addGroup(jPanel5Layout.createSequentialGroup()
+                        .addGap(52, 52, 52)
+                        .addComponent(jTextFieldUpperLimit, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addComponent(jTextFieldStep, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(15, 15, 15))))
+                        .addContainerGap())))
         );
         jPanel5Layout.setVerticalGroup(
             jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -130,14 +131,14 @@ public class Java_calculation extends javax.swing.JFrame {
                 .addContainerGap()
                 .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabelLower)
-                    .addComponent(jLabelUpper)
-                    .addComponent(jLabelStep))
+                    .addComponent(jLabelStep)
+                    .addComponent(jLabelUpper, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jTextFieldLowerLimit, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jTextFieldUpperLimit, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jTextFieldStep, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(42, Short.MAX_VALUE))
+                .addGap(42, 42, 42))
         );
 
         jPanel6.setBackground(new java.awt.Color(255, 255, 51));
@@ -531,7 +532,7 @@ public class Java_calculation extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_jMenuItemLoadBinaryActionPerformed
 
-    // Lab 7: l-7sab dyal l-intégrale f bzaf d les threads (Runnable)
+    // Lab 7: l-7sab dyal l-intégrale f bzaf d les threads (Callable + ExecutorService)
     private void startThreads(final RecIntegral rec, final int rowNum) {
         // thread "coordinateur": kay-lanci les threads o kaytsennahom,
         // bach l-interface ma-tjmedch
@@ -542,27 +543,33 @@ public class Java_calculation extends javax.swing.JFrame {
             double upperLim = rec.getUpperLim();
             double step = rec.getStep();
 
-            IntegralTask[] tasks = new IntegralTask[THREADS];
-            Thread[] threads = new Thread[THREADS];
+            // pool fih 9 threads; kol Callable kat-rje3 l-résultat dyalha f Future
+            ExecutorService executor = Executors.newFixedThreadPool(THREADS);
+            ArrayList<Future<Double>> futures = new ArrayList<>();
             double part = (upperLim - lowLim) / THREADS;
 
             for (int i = 0; i < THREADS; i++) {
                 double a = lowLim + i * part;
                 double b = (i == THREADS - 1) ? upperLim : a + part;
-                tasks[i] = new IntegralTask(rec, a, b, step);
-                threads[i] = new Thread(tasks[i], "IntegralThread-" + (i + 1));
-                threads[i].start();
+                futures.add(executor.submit(new IntegralCallable(rec, a, b, step)));
             }
 
             double sum = 0;
             try {
-                for (int i = 0; i < THREADS; i++) {
-                    threads[i].join();            // tsenna l-thread ysali
-                    sum += tasks[i].getResult();
+                for (Future<Double> future : futures) {
+                    sum += future.get();          // tsenna l-résultat dyal kol task
                 }
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
                 return;
+            } catch (ExecutionException e) {
+                javax.swing.SwingUtilities.invokeLater(() ->
+                        JOptionPane.showMessageDialog(this,
+                                "Calculation error: " + e.getCause(),
+                                "Error", JOptionPane.ERROR_MESSAGE));
+                return;
+            } finally {
+                executor.shutdown();
             }
 
             final double result = sum;
