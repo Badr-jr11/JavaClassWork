@@ -1,22 +1,51 @@
 public class RecIntegral {
 
+    private static final double MIN_VALUE = 0.000001;
+    private static final double MAX_VALUE = 1000000.0;
+
     private double upperLim;
     private double lowLim;
     private double step;
     private double result;
 
-    public RecIntegral(double lowLim, double upperLim, double step) {
+    public RecIntegral(double lowLim, double upperLim, double step) throws InvalidRangeException {
+        validateRange(lowLim);
+        validateRange(upperLim);
+        validateRange(step);
+        validateLimits(lowLim, upperLim);
+
         this.lowLim = lowLim;
         this.upperLim = upperLim;
         this.step = step;
         this.result = 0.0;
     }
 
-    public RecIntegral(double lowLim, double upperLim, double step, double result) {
+    public RecIntegral(double lowLim, double upperLim, double step, double result) throws InvalidRangeException {
+        validateRange(lowLim);
+        validateRange(upperLim);
+        validateRange(step);
+        validateLimits(lowLim, upperLim);
+
         this.lowLim = lowLim;
         this.upperLim = upperLim;
         this.step = step;
         this.result = result;
+    }
+
+    private void validateRange(double value) throws InvalidRangeException {
+        if (value < MIN_VALUE || value > MAX_VALUE) {
+            throw new InvalidRangeException(
+                "The data value must be in the range from " +
+                MIN_VALUE + " to " + MAX_VALUE + "\n", value);
+        }
+    }
+
+    private void validateLimits(double lowLim, double upperLim) throws InvalidRangeException {
+        if (lowLim > upperLim) {
+            throw new InvalidRangeException(
+                "The lower limit (" + lowLim + ") must not be greater than the upper limit ("
+                + upperLim + ")\n", lowLim);
+        }
     }
 
     public double getLowLim() { return lowLim; }

@@ -248,24 +248,47 @@ public class Java_calculation extends javax.swing.JFrame {
     }//GEN-LAST:event_jButtonDeleteActionPerformed
 
     private void jButtonCalculateActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonCalculateActionPerformed
-        int rowNum = jTable1.getSelectedRow();
+       
+    int rowNum = jTable1.getSelectedRow();
 
-        if (rowNum == -1) {
-            JOptionPane.showMessageDialog(null, "You need to select a row");
-        } else {
-            DefaultTableModel tModel = (DefaultTableModel) jTable1.getModel();
+    if (rowNum == -1) {
+        JOptionPane.showMessageDialog(null, "You need to select a row");
+    } else {
+        DefaultTableModel tModel = (DefaultTableModel) jTable1.getModel();
 
-            double lowLim = Double.parseDouble(tModel.getValueAt(rowNum, 0).toString());
-            double upperLim = Double.parseDouble(tModel.getValueAt(rowNum, 1).toString());
-            double step = Double.parseDouble(tModel.getValueAt(rowNum, 2).toString());
+        double upperLim;
+        double lowLim;
+        double step;
+        double result;
+
+        try {
+            lowLim   = Double.parseDouble(tModel.getValueAt(rowNum, 0).toString());
+            upperLim = Double.parseDouble(tModel.getValueAt(rowNum, 1).toString());
+            step     = Double.parseDouble(tModel.getValueAt(rowNum, 2).toString());
+
+            if (step == 0) {
+                throw new IllegalArgumentException("Step cannot be 0 (division by zero)");
+            }
 
             RecIntegral rec = new RecIntegral(lowLim, upperLim, step);
-            double result = rec.CalcIntegral(rec.getLowLim(), rec.getUpperLim(), rec.getStep());
+            result = rec.CalcIntegral(rec.getLowLim(), rec.getUpperLim(), rec.getStep());
             rec.setResult(result);
 
             tModel.setValueAt(rec.getResult(), rowNum, 3);
             arrInteg.set(rowNum, rec);
-}
+            
+        } catch (IllegalArgumentException e) {
+            JOptionPane.showMessageDialog(this,
+                    e.getMessage(),
+                    "Error", JOptionPane.ERROR_MESSAGE);
+        } catch (InvalidRangeException exe) {
+            JOptionPane.showMessageDialog(this,
+                    exe.getMessage() + "Your data: " + exe.getErrVal(),
+                    "Input error", JOptionPane.WARNING_MESSAGE);
+        }
+    }
+
+
 
     }//GEN-LAST:event_jButtonCalculateActionPerformed
 
@@ -278,19 +301,39 @@ public class Java_calculation extends javax.swing.JFrame {
     }//GEN-LAST:event_jTextFieldLowerLimitActionPerformed
 
     private void jButtonAddActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonAddActionPerformed
-        double lowLim = Double.parseDouble(jTextFieldLowerLimit.getText());
-        double upperLim = Double.parseDouble(jTextFieldUpperLimit.getText());
-        double step = Double.parseDouble(jTextFieldStep.getText());
+     
+    double lowLim;
+    double upperLim;
+    double step;
+
+    try {
+        lowLim   = Double.parseDouble(jTextFieldLowerLimit.getText());
+        upperLim = Double.parseDouble(jTextFieldUpperLimit.getText());
+        step     = Double.parseDouble(jTextFieldStep.getText());
 
         RecIntegral rec = new RecIntegral(lowLim, upperLim, step);
         arrInteg.add(rec);
 
         DefaultTableModel tModel = (DefaultTableModel) jTable1.getModel();
-        tModel.addRow(new Object[] {rec.getLowLim(), rec.getUpperLim(), rec.getStep()});
+        tModel.addRow(new Object[]{rec.getLowLim(), rec.getUpperLim(), rec.getStep()});
 
+    } catch (NumberFormatException ex) {
+        JOptionPane.showMessageDialog(this,
+                "Enter the correct numbers (the decimal separator is a dot)",
+                "Input error", JOptionPane.ERROR_MESSAGE);
+        
+     } catch (InvalidRangeException exe) {
+        JOptionPane.showMessageDialog(this,
+                exe.getMessage() + "Your data: " + exe.getErrVal(),
+                "Input error", JOptionPane.WARNING_MESSAGE);
+  
+        
+    } finally {
         jTextFieldLowerLimit.setText("");
         jTextFieldUpperLimit.setText("");
         jTextFieldStep.setText("");
+    }
+
     }//GEN-LAST:event_jButtonAddActionPerformed
 
     private void jButtonFillActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonFillActionPerformed
